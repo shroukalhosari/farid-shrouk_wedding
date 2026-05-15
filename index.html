@@ -3,6 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Fared & Shrouk Wedding</title>
 
@@ -132,7 +133,7 @@ img{
     box-shadow:0 0 10px #ccc;
 }
 
-/* === التنسيقات الجديدة لقسم التعليقات أسفل الصفحة === */
+/* قسم التعليقات */
 
 .comment-section {
     max-width: 500px;
@@ -153,7 +154,8 @@ img{
     margin-top: 0;
 }
 
-.comment-form input, .comment-form textarea {
+.comment-form input,
+.comment-form textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -165,7 +167,8 @@ img{
     text-align: right;
 }
 
-.comment-form input:focus, .comment-form textarea:focus {
+.comment-form input:focus,
+.comment-form textarea:focus {
     border-color: maroon;
 }
 
@@ -230,7 +233,8 @@ img{
 
 </div>
 
-<audio src="music.mp3" loop></audio>
+<!-- الموسيقى -->
+<audio id="bg-music" src="music.mp3" loop></audio>
 
 <div class="header">
     Fared & Shrouk ♥️💍
@@ -263,7 +267,7 @@ img{
 <div class="container">
 
     <div class="card">
-        <div class="title">Katp ketap</div>
+        <div class="title">Katb Ketab</div>
         <div class="date">25/6/2026</div>
         <div class="place">Elryan Hall</div>
     </div>
@@ -278,19 +282,21 @@ img{
 
 <img src="shrouk77.jpeg">
 
-
 <div class="comment-section">
     <h2>A message with love ❤️</h2>
+
     <div class="comment-form">
+
         <input type="text" id="userName" placeholder="الاسم الأول..." required>
+
         <textarea id="userComment" rows="3" placeholder="اكتب رسالتك أو مباركتك هنا..." required></textarea>
+
         <button onclick="addComment()">إرسال الرسالة ✨</button>
+
     </div>
 </div>
 
-<div class="comments-display" id="commentsDisplay">
-    </div>
-
+<div class="comments-display" id="commentsDisplay"></div>
 
 <script>
 
@@ -303,6 +309,14 @@ setInterval(function(){
     var now = new Date().getTime();
 
     var distance = weddingDate - now;
+
+    if (distance < 0) {
+        document.getElementById("days").innerHTML = 0;
+        document.getElementById("hours").innerHTML = 0;
+        document.getElementById("minutes").innerHTML = 0;
+        document.getElementById("seconds").innerHTML = 0;
+        return;
+    }
 
     document.getElementById("days").innerHTML =
     Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -326,34 +340,22 @@ document.getElementById("welcome").style.display = "none";
 
 },7000);
 
-
-/* === برمجية تشغيل الموسيقى والتعليقات الجديدة === */
+/* تشغيل الموسيقى */
 
 var music = document.getElementById("bg-music");
 
-function playMusic() {
-    music.play().catch(function(error) {
-        console.log("المتصفح يمنع التشغيل التلقائي قبل تفاعل المستخدم.");
-    });
-}
-
-// تشغيل الموسيقى فوراً عند أول نقرة للمستخدم على الشاشة لتخطي قيود المتصفحات
-document.addEventListener('click', function() {
-    playMusic();
+document.addEventListener('click', function () {
+    music.play();
 }, { once: true });
 
-// تشغيل الموسيقى بعد اختفاء شاشة الترحيب تلقائياً
-setTimeout(function() {
-    playMusic();
-}, 7000);
+/* تحميل التعليقات */
 
-
-// تحميل وعرض التعليقات القديمة عند فتح الصفحة مباشرة
 window.onload = function() {
     loadComments();
 };
 
 function addComment() {
+
     var nameInput = document.getElementById("userName");
     var commentInput = document.getElementById("userComment");
 
@@ -365,45 +367,58 @@ function addComment() {
         return;
     }
 
+    if (comment.length > 200) {
+        alert("الرسالة طويلة جدًا 🤍");
+        return;
+    }
+
     var newComment = {
         username: name,
         text: comment
     };
 
-    // جلب التعليقات القديمة من ذاكرة المتصفح وضغط الجديدة معها
     var commentsList = JSON.parse(localStorage.getItem("weddingComments")) || [];
+
     commentsList.push(newComment);
 
-    // حفظ القائمة المحدثة في الذاكرة لتظل ثابتة ولا تختفي عند تحديث الصفحة
     localStorage.setItem("weddingComments", JSON.stringify(commentsList));
 
-    // إعادة عرض التعليقات وتفريغ خانات الكتابة
     loadComments();
+
     nameInput.value = "";
     commentInput.value = "";
 }
 
 function loadComments() {
+
     var commentsDisplay = document.getElementById("commentsDisplay");
-    commentsDisplay.innerHTML = ""; // تنظيف القسم أولاً قبل العرض
+
+    commentsDisplay.innerHTML = "";
 
     var commentsList = JSON.parse(localStorage.getItem("weddingComments")) || [];
 
-    // عرض الرسائل والتعليقات من الأحدث إلى الأقدم
     for (var i = commentsList.length - 1; i >= 0; i--) {
+
         var box = document.createElement("div");
+
         box.className = "comment-box";
 
         var userDiv = document.createElement("div");
+
         userDiv.className = "comment-user";
+
         userDiv.innerText = commentsList[i].username;
 
         var textDiv = document.createElement("div");
+
         textDiv.className = "comment-text";
+
         textDiv.innerText = commentsList[i].text;
 
         box.appendChild(userDiv);
+
         box.appendChild(textDiv);
+
         commentsDisplay.appendChild(box);
     }
 }
